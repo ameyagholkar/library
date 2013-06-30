@@ -1,0 +1,17 @@
+{% extends 'booklist.html' %}
+{% block bookaction %}
+
+	<form method='POST' action="/checkout/{{ book.getBookProperty('isbn_13') }}">
+
+{% endblock bookaction %}
+
+
+{% block bookactionend %}
+
+		<tr>
+			<td>
+				<input type='Submit' value='Checkout Book'>
+			</td>
+		</tr>
+
+{% endblock bookactionend %}

@@ -1,0 +1,73 @@
+<!doctype html>
+<title>Hello from Flask</title>
+  {% if error %}
+    <p class=error><strong>Error:</strong> {{ error }}
+  {% endif %}
+
+
+<table border='1'>
+{% for book in booksFound %}
+		{% block addbook scoped %} {% endblock addbook %}
+			<tr>
+		<td>
+			<img src="{{ book.getBookProperty('thumbnail')}}" height='200' width='128'>
+		</td>
+		<td>
+			<table border='1'>
+				<tr>
+					<td>
+					 Title: {{ book.getBookProperty('title') }} 
+					</td>
+				</tr>
+
+				<tr>
+					<td>
+					 Authors: {% for author in book.getBookProperty('authors') %} 
+					 				{{ author }}
+					 		   {% endfor %} 
+					</td>
+				</tr>
+
+				<tr>
+					<td>
+					 Description: {{ book.getBookProperty('description') }} 
+				
+					</td>
+				</tr>
+
+				<tr>
+					<td>	
+					 Rating: {{ book.getBookProperty('rating') }} 
+					</td>
+				</tr>
+
+				<tr>
+					<td>	
+					 Number of Pages: {{ book.getBookProperty('pageCount') }} 
+					</td>
+				</tr>
+
+				<tr>
+					<td>
+					 Published Date: {{ book.getBookProperty('publishedDate') }} 
+					</td>
+				</tr>
+
+				<tr>
+					<td>	
+					 Language: {{ book.getBookProperty('language').upper() }} 
+					</td>
+				</tr>
+
+				<tr>
+					<td>	
+					 Preview: <a href="{{ book.getBookProperty('previewLink') }}">Preview</a> 
+					</td>
+				</tr>
+			</table>
+		</td>
+		{% block addbookend scoped %} {% endblock addbookend %}
+	</tr>	
+	</form>
+{% endfor %}
+</table>

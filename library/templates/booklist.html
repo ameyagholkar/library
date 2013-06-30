@@ -1,0 +1,86 @@
+<!doctype html>
+<head>
+<script src="http://code.jquery.com/jquery.js"></script>
+<script src="{{url_for('static', filename='bootstrap.min.js')}}"></script>
+<link href="{{url_for('static', filename='bootstrap.min.css')}}" rel="stylesheet" media="screen">
+</head>
+<title>Hello from Flask</title>
+  {% if error %}
+    <p class=error><strong>Error:</strong> {{ error }}
+  {% endif %}
+  {% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <ul class=flashes>
+    {% for message in messages %}
+      <li>{{ message }}</li>
+    {% endfor %}
+    </ul>
+  {% endif %}
+{% endwith %}
+
+<table class="table table-hover">
+{% for book in booksFound %}
+		{% block bookaction scoped %} {% endblock bookaction %}
+		<tr>
+		<td>
+			<img src="{{ book.getBookProperty('thumbnail')}}" height='200' width='128'>
+		</td>
+		<td>
+			<table class="table table-hover">
+				<tr>
+					<td>
+					 <legend>Title</legend> {{ book.getBookProperty('title') }} 
+					</td>
+				</tr>
+
+				<tr>
+					<td>
+					 Authors: {% for author in book.getBookProperty('authors') %} 
+					 				{{ author }}
+					 		   {% endfor %} 
+					</td>
+				</tr>
+
+				<tr>
+					<td>
+					 Description: {{ book.getBookProperty('description') }} 
+				
+					</td>
+				</tr>
+
+				<tr>
+					<td>	
+					 Rating: {{ book.getBookProperty('rating') }} 
+					</td>
+				</tr>
+
+				<tr>
+					<td>	
+					 Number of Pages: {{ book.getBookProperty('pageCount') }} 
+					</td>
+				</tr>
+
+				<tr>
+					<td>
+					 Published Date: {{ book.getBookProperty('publishedDate') }} 
+					</td>
+				</tr>
+
+				<tr>
+					<td>	
+					 Language: {{ book.getBookProperty('language').upper() }} 
+					</td>
+				</tr>
+
+				<tr>
+					<td>	
+					 Preview: <a href="{{ book.getBookProperty('previewLink') }}" target='_blank'>Preview</a> 
+					</td>
+				</tr>
+			</table>
+		</td>
+	</tr>	
+	{% block bookactionend scoped %} {% endblock bookactionend %}
+	</form>
+{% endfor %}
+</table>

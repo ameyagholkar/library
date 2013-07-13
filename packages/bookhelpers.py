@@ -1,4 +1,3 @@
-import json
 import requests
 from models.book import Book
 
@@ -14,7 +13,6 @@ def getDefaultValue(value):
 		return ''
 
 def addBookProperty(parentBook, book, keyToAdd, *searchKeys):
-	value = None
 	try:
 		for key in searchKeys:
 			parentBook = parentBook[key]
@@ -25,11 +23,9 @@ def addBookProperty(parentBook, book, keyToAdd, *searchKeys):
 	else:
 		book.addBookISBN(parentBook)
 
-def retrieveBookByISBN(isbn):
-	url = 'https://www.googleapis.com/books/v1/volumes?q=isbn:' + isbn
-	booksJson = requests.get(url).json()
-	matchedBooks = []
 
+def convert_json_to_POJO_list(booksJson):
+	matchedBooks = []
 	if booksJson['totalItems'] != 0:
 		for book in booksJson['items']:
 			b = Book()
@@ -47,6 +43,25 @@ def retrieveBookByISBN(isbn):
 			addBookProperty(book, b, 'previewLink', 'volumeInfo', 'previewLink')
 			addBookProperty(book, b, 'country', 'saleInfo', 'country')
 			matchedBooks.append(b)
+	return matchedBooks
+
+def retrieveBookByISBN(isbn):
+	url = 'https://www.googleapis.com/books/v1/volumes?q=isbn:' + isbn + '&country=US'
+	booksJson = requests.get(url).json()
+	matchedBooks = convert_json_to_POJO_list(booksJson)		
+	return matchedBooks
+
+
+def retrieveBookByTitle(title):
+	url = 'https://www.googleapis.com/books/v1/volumes?q=title:' + title + '&country=US'
+	booksJson = requests.get(url).json()
+	matchedBooks = convert_json_to_POJO_list(booksJson)		
+	return matchedBooks
+
+def retrieveBookByAuthor(author):
+	url = 'https://www.googleapis.com/books/v1/volumes?q=author:' + author + '&country=US'
+	booksJson = requests.get(url).json()
+	matchedBooks = convert_json_to_POJO_list(booksJson)		
 	return matchedBooks
 
 

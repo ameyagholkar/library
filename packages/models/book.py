@@ -24,10 +24,9 @@ class Book:
 		try:
 			return self.book[key]
 		except Exception, e:
-			raise e
+			return None
 
 	def addBookISBN(self, isbn_list):
 		for isbn in isbn_list:
-			print type(isbn['type'].lower())
 			self.add(isbn['type'].lower(), isbn['identifier'])
 

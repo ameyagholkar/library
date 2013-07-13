@@ -8,10 +8,10 @@
 
 {% block bookactionend %}
 
-		<tr>
-			<td>
-				<input type='Submit' value='Add Book to Library'>
-			</td>
-		</tr>
+				{% if book.getBookProperty('isbn_13') %}
+					<input type='Submit' value='Add Book to Library' class='btn btn-primary' >
+				{% else %}
+					<input type='Submit' value='Invalid Book' class='btn' disabled="disabled">
+				{% endif %}
 
 {% endblock bookactionend %}

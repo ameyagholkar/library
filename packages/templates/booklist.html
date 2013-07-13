@@ -1,86 +1,157 @@
 <!doctype html>
 <head>
 <script src="http://code.jquery.com/jquery.js"></script>
-<script src="{{url_for('static', filename='bootstrap.min.js')}}"></script>
-<link href="{{url_for('static', filename='bootstrap.min.css')}}" rel="stylesheet" media="screen">
+<script src="{{url_for('static', filename='bootstrap/js/bootstrap.min.js')}}"></script>
+<link href="{{url_for('static', filename='bootstrap/css/bootstrap.min.css')}}"
+	rel="stylesheet" media="screen">
 </head>
 <title>Hello from Flask</title>
-  {% if error %}
-    <p class=error><strong>Error:</strong> {{ error }}
-  {% endif %}
-  {% with messages = get_flashed_messages() %}
-  {% if messages %}
-    <ul class=flashes>
-    {% for message in messages %}
-      <li>{{ message }}</li>
-    {% endfor %}
-    </ul>
-  {% endif %}
-{% endwith %}
-
+<body class='lead container'>
+			{% if session['username'] %}
+					<div class="alert alert-block alert-info">
+						<p class="lead"> Welcome {{ session['username'] }} </p>
+					</div>
+			{% else %}
+					<div class="alert alert-block alert-info">
+						<p class="lead"> <a href='/login'>Login</a> </p>
+					</div>
+			{% endif %}
+	<div class="container" align="center" >
+			<form class="form-inline" id="searchBooks" action="/search" method="post">
+		
+				<input class="input-xxlarge" type="text" name="query" placeholder="Search by ISBN, Exact Book Tile or Author.."> 
+				<input class="btn btn-primary" type="Submit" value="Search Books" />
+		
+			</form>
+	</div>
+	{% if googleTitle %}
+	<div class="container" align="center">
+			<form class="form-inline" id="resetResults" action="/shelf" method="post">
+				<input class="btn" type="Submit" value="Clear All Search Results" />
+			</form>
+	</div>
+	{% endif %}
+ 	{% with messages = get_flashed_messages(with_categories=true) %} 
+	 	{% if messages %}
+			{% for category, message in messages %}
+			<div class="alert alert-block alert-{{ category }}">
+				<p class=lead>	{{ message }} </p>
+			</div>
+			{% endfor %}
+		{% endif %} 	
+	{% endwith %} 
+	
+	
 <table class="table table-hover">
-{% for book in booksFound %}
-		{% block bookaction scoped %} {% endblock bookaction %}
-		<tr>
-		<td>
-			<img src="{{ book.getBookProperty('thumbnail')}}" height='200' width='128'>
-		</td>
-		<td>
-			<table class="table table-hover">
-				<tr>
-					<td>
-					 <legend>Title</legend> {{ book.getBookProperty('title') }} 
-					</td>
-				</tr>
+		{% if error %}
+			<div class="alert alert-block alert-error">
+				<p class=lead> {{ error }} </p>
+			</div>	
+		{% else %}
+	
+			{% if googleTitle %}
+				<th colspan="2">
+					<div class="alert alert-block alert-success">
+						<p class="lead"> {{ googleTitle }} </p>
+					</div>
+				</th>
+			{% else %}
+				<th colspan="2">
+					<div class="alert alert-block alert-success">
+						<p class="lead"> Books on Shelf </p>
+					</div>
+				</th>
+			{% endif %}
+			
+			{% if booksFound|length == 0 %}
+				<div class="alert alert-block alert-info">
+					<p class=lead> There are no books in our shelf. Search for a book by its ISBN or <strong>exact</strong> title
+					and add it to our shelf.</p>
+				</div>	
+			{% endif %}
 
-				<tr>
-					<td>
-					 Authors: {% for author in book.getBookProperty('authors') %} 
-					 				{{ author }}
-					 		   {% endfor %} 
-					</td>
-				</tr>
-
-				<tr>
-					<td>
-					 Description: {{ book.getBookProperty('description') }} 
+{% for book in booksFound %} 
+		
+			<tr>	
+				<td rowspan="2">
+					{% block bookaction scoped %} {% endblock bookaction %}
+					
+					<img src="{{ book.getBookProperty('thumbnail')}}" height='200'
+									width='128'>
+				</td>
 				
-					</td>
-				</tr>
+			</tr>
+			<tr>
+				<td>
+						<div class="span8">
+	
+							<strong><legend> Title </legend></strong> {{
+							book.getBookProperty('title') }}
+							<div class="row">
+								<div class="span6">
+										{% for author in book.getBookProperty('authors') %}
+										 {{ author }} 
+										 {% if not loop.last %}
+	   											 ,
+										 {% endif %}	
+									{% endfor %}
+									<hr>
+								</div>
+								<div class="span6">
+									{% set i=1 %}
+									{% for i in range(1, book.getBookProperty('rating')|int) %}
+										<i class="icon-star"></i>
+									{% endfor %}
+									<hr>
+								</div>
+								<div class="span6">
+									{{ book.getBookProperty('publisher')|default('Unknown', true) }}, {{ book.getBookProperty('country') }}-{{ book.getBookProperty('language')|upper }}, {{ book.getBookProperty('publishedDate') }}, {{ book.getBookProperty('pageCount')|default('unknown number of ', true) }} pages. 
+									<strong><a href="{{book.getBookProperty('previewLink')}}" target="_blank" class="btn btn-primary">Preview</a></strong>
+									<hr>
+								</div>
+								<div class = "span6">
+								{% block bookactionend scoped %} {% endblock bookactionend %}
+								<hr>
+								</div>
+							</div>
+							<div class="row">
+								<div class="span10">
+								<div class="accordion" id="accordion{{loop.index}}">
+									<div class="accordion-group">
+									    <div class="accordion-heading">
+										      <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion{{loop.index}}" href="#collapse{{loop.index}}1">
+										        <strong>Read Synopsis<strong>
+										      </a>
+		    							</div>
+		    							<div id="collapse{{loop.index}}1" class="accordion-body collapse out">
+			     							 <div class="accordion-inner">
+			        							<p align="left"><pre>{{ book.getBookProperty('description') }}</pre></p>
+			      							</div>
+		    							</div>
+									</div>
+								</div>
+							</div>
+							</div>
+						</div>
 
-				<tr>
-					<td>	
-					 Rating: {{ book.getBookProperty('rating') }} 
-					</td>
-				</tr>
+				</td>
+			</tr>
+			<tr>
+				<td></td>
+				<td></td>
+			</tr>
+			
+		
+{% endfor %}		
+			
+			
 
-				<tr>
-					<td>	
-					 Number of Pages: {{ book.getBookProperty('pageCount') }} 
-					</td>
-				</tr>
+				</table>
 
-				<tr>
-					<td>
-					 Published Date: {{ book.getBookProperty('publishedDate') }} 
-					</td>
-				</tr>
 
-				<tr>
-					<td>	
-					 Language: {{ book.getBookProperty('language').upper() }} 
-					</td>
-				</tr>
 
-				<tr>
-					<td>	
-					 Preview: <a href="{{ book.getBookProperty('previewLink') }}" target='_blank'>Preview</a> 
-					</td>
-				</tr>
-			</table>
-		</td>
-	</tr>	
-	{% block bookactionend scoped %} {% endblock bookactionend %}
-	</form>
-{% endfor %}
+
+
+	{% endif %}
 </table>
+</body>

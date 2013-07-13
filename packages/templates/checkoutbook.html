@@ -8,10 +8,8 @@
 
 {% block bookactionend %}
 
-		<tr>
-			<td>
-				<input type='Submit' value='Checkout Book'>
-			</td>
-		</tr>
 
+	<input type='Submit' value='Checkout {{ book.getBookProperty("title") }}' class='btn btn-primary'>
+	</form>
+	
 {% endblock bookactionend %}

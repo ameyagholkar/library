@@ -13,6 +13,8 @@ def home_page():
 def register_new_user():
 	db = connect_db().users
 	newUser = User()
+	newUser.add('name', request.form['name'])
+	newUser.add('email', request.form['email'])
 	newUser.add('username', request.form['username'])
 	newUser.add('password', request.form['password'])
 	existingUser = db.find_one({'user.username' : newUser.getProperty('username')})

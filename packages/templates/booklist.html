@@ -4,18 +4,31 @@
 <script src="{{url_for('static', filename='bootstrap/js/bootstrap.min.js')}}"></script>
 <link href="{{url_for('static', filename='bootstrap/css/bootstrap.min.css')}}"
 	rel="stylesheet" media="screen">
+<link rel="stylesheet" href="{{url_for('static', filename='font-awesome/css/font-awesome.min.css')}}">
+<!--[if IE 7]>
+  <link rel="stylesheet" href="{{url_for('static', filename='font-awesome/css/font-awesome-ie7.min.css')}}">
+<![endif]-->
 </head>
 <title>Hello from Flask</title>
 <body class='lead container'>
+		<div class="alert alert-block alert-info">	
+			<h1 class="text-center"><i class="icon-book icon-large"></i>&nbsp;Library Management</h1>
 			{% if session['username'] %}
-					<div class="alert alert-block alert-info">
-						<p class="lead"> Welcome {{ session['username'] }} </p>
-					</div>
+					
+						<p class="lead text-right">
+						<i class="icon-user icon-large"></i>
+						{{ session['username'] }} 
+						<i class="icon-ellipsis-vertical icon-large"></i>
+						<i class="icon-signout icon-large"></i>
+						<a class="lead" href="/logout">Logout</a>
+						</p>
 			{% else %}
-					<div class="alert alert-block alert-info">
-						<p class="lead"> <a href='/login'>Login</a> </p>
-					</div>
+						<p class="lead text-right"> 
+							<i class="icon-signin icon-large"></i>
+							<a href='/login'>Login</a> 
+						</p>
 			{% endif %}
+		</div>
 	<div class="container" align="center" >
 			<form class="form-inline" id="searchBooks" action="/search" method="post">
 		
@@ -24,7 +37,7 @@
 		
 			</form>
 	</div>
-	{% if googleTitle %}
+	{% if searchTitle %}
 	<div class="container" align="center">
 			<form class="form-inline" id="resetResults" action="/shelf" method="post">
 				<input class="btn" type="Submit" value="Clear All Search Results" />
@@ -49,16 +62,10 @@
 			</div>	
 		{% else %}
 	
-			{% if googleTitle %}
+			{% if searchTitle %}
 				<th colspan="2">
 					<div class="alert alert-block alert-success">
-						<p class="lead"> {{ googleTitle }} </p>
-					</div>
-				</th>
-			{% else %}
-				<th colspan="2">
-					<div class="alert alert-block alert-success">
-						<p class="lead"> Books on Shelf </p>
+						<p class="lead"> {{ searchTitle }} </p>
 					</div>
 				</th>
 			{% endif %}
@@ -69,7 +76,14 @@
 					and add it to our shelf.</p>
 				</div>	
 			{% endif %}
-
+			
+			{% if booksFound|length > 0 and not searchTitle %}
+				<th colspan="2">
+					<div class="alert alert-block alert-success">
+						<p class="lead"> Books on Shelf </p>
+					</div>
+				</th>
+			{% endif %}
 {% for book in booksFound %} 
 		
 			<tr>	

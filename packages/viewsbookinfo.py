@@ -22,7 +22,7 @@ def search_books():
 	if check_authentication(session):
 		query = request.form['query']
 		isbn = text = None
-		googleTitle = "Matching Books on our Shelf"
+		searchTitle = "Matching Books on our Shelf"
 		error = None
 		isISBN = False
 		resultBookList = []
@@ -45,11 +45,11 @@ def search_books():
 	
 		if len(resultBookList) == 0:
 			flash("No matching books found on our shelf.", 'error')
-			googleTitle = "Matching Books found on Earth"
+			searchTitle = "Matching Books found on Earth"
 			(resultBookList, error) = search_books_on_google(query, isISBN)
-			return render_template('addbook.html', booksFound=resultBookList, googleTitle=googleTitle, error=error)
+			return render_template('addbook.html', booksFound=resultBookList, searchTitle=searchTitle, error=error)
 				
-		return render_template('checkoutbook.html', booksFound=resultBookList, googleTitle=googleTitle, error=error)
+		return render_template('checkoutbook.html', booksFound=resultBookList, searchTitle=searchTitle, error=error)
 	else:
 		return redirect(url_for('show_all_books'))
 

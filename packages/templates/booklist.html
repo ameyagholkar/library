@@ -1,15 +1,13 @@
-<!doctype html>
-<head>
-<script src="http://code.jquery.com/jquery.js"></script>
-<script src="{{url_for('static', filename='bootstrap/js/bootstrap.min.js')}}"></script>
-<link href="{{url_for('static', filename='bootstrap/css/bootstrap.min.css')}}"
-	rel="stylesheet" media="screen">
-<link rel="stylesheet" href="{{url_for('static', filename='font-awesome/css/font-awesome.min.css')}}">
-<!--[if IE 7]>
-  <link rel="stylesheet" href="{{url_for('static', filename='font-awesome/css/font-awesome-ie7.min.css')}}">
-<![endif]-->
-</head>
-<title>Hello from Flask</title>
+{% extends 'base.html' %}
+{% block content %}
+<style>
+.noBorderTable td {
+	border-bottom: none;
+	border-top:none;
+	padding: 1;
+}
+
+</style>
 <body class='lead container'>
 		<div class="alert alert-block alert-info">	
 			<h1 class="text-center"><i class="icon-book icon-large"></i>&nbsp;Library Management</h1>
@@ -29,11 +27,11 @@
 						</p>
 			{% endif %}
 		</div>
-	<div class="container" align="center" >
+	<div class="well well-small" align="center" style="padding-top: 25px;">
 			<form class="form-inline" id="searchBooks" action="/search" method="post">
 		
 				<input class="input-xxlarge" type="text" name="query" placeholder="Search by ISBN, Exact Book Tile or Author.."> 
-				<input class="btn btn-primary" type="Submit" value="Search Books" />
+				<button class="btn btn-primary" type="Submit"><i class="icon-search"></i>&nbsp;Search</button>
 		
 			</form>
 	</div>
@@ -55,7 +53,8 @@
 	{% endwith %} 
 	
 	
-<table class="table table-hover">
+<table class="table">
+		<thead>
 		{% if error %}
 			<div class="alert alert-block alert-error">
 				<p class=lead> {{ error }} </p>
@@ -63,10 +62,8 @@
 		{% else %}
 	
 			{% if searchTitle %}
-				<th colspan="2">
-					<div class="alert alert-block alert-success">
-						<p class="lead"> {{ searchTitle }} </p>
-					</div>
+				<th colspan="2" style="padding-top:25px;background-color: #DCDCDC">
+					<p class="lead text-center"> {{ searchTitle }} </p>
 				</th>
 			{% endif %}
 			
@@ -78,29 +75,36 @@
 			{% endif %}
 			
 			{% if booksFound|length > 0 and not searchTitle %}
-				<th colspan="2">
-					<div class="alert alert-block alert-success">
-						<p class="lead"> Books on Shelf </p>
-					</div>
+				<th colspan="2" style="padding-top:25px;background-color: #DCDCDC">
+					<p class="lead text-center">Books on Shelf</p>
 				</th>
+			</thead>
 			{% endif %}
-{% for book in booksFound %} 
+			<tbody>
+	{% for book in booksFound %} 
 		
 			<tr>	
 				<td rowspan="2">
-					{% block bookaction scoped %} {% endblock bookaction %}
-					
-					<img src="{{ book.getBookProperty('thumbnail')}}" height='200'
-									width='128'>
+					<table class="table-condensed noBorderTable">
+						<tr> 
+							<td>
+								<img src="{{ book.getBookProperty('thumbnail')}}" height='200'
+												width='190'>
+							</td>
+						</tr>
+						<tr>
+							<td>
+								{% block bookaction scoped %} {% endblock bookaction %}
+								{% block bookactionend scoped %} {% endblock bookactionend %} 
+							</td>
+						</tr>
+					</table>
 				</td>
-				
 			</tr>
 			<tr>
 				<td>
 						<div class="span8">
-	
-							<strong><legend> Title </legend></strong> {{
-							book.getBookProperty('title') }}
+							<strong>{{ book.getBookProperty('title') }}</strong>
 							<div class="row">
 								<div class="span6">
 										{% for author in book.getBookProperty('authors') %}
@@ -120,26 +124,21 @@
 								</div>
 								<div class="span6">
 									{{ book.getBookProperty('publisher')|default('Unknown', true) }}, {{ book.getBookProperty('country') }}-{{ book.getBookProperty('language')|upper }}, {{ book.getBookProperty('publishedDate') }}, {{ book.getBookProperty('pageCount')|default('unknown number of ', true) }} pages. 
-									<strong><a href="{{book.getBookProperty('previewLink')}}" target="_blank" class="btn btn-primary">Preview</a></strong>
 									<hr>
-								</div>
-								<div class = "span6">
-								{% block bookactionend scoped %} {% endblock bookactionend %}
-								<hr>
 								</div>
 							</div>
 							<div class="row">
-								<div class="span10">
+								<div class="span8">
 								<div class="accordion" id="accordion{{loop.index}}">
 									<div class="accordion-group">
 									    <div class="accordion-heading">
 										      <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion{{loop.index}}" href="#collapse{{loop.index}}1">
-										        <strong>Read Synopsis<strong>
+										        <strong>Read Synopsis</strong>
 										      </a>
 		    							</div>
 		    							<div id="collapse{{loop.index}}1" class="accordion-body collapse out">
-			     							 <div class="accordion-inner">
-			        							<p align="left"><pre>{{ book.getBookProperty('description') }}</pre></p>
+			     							 <div class="accordion-inner" style="overflow: auto; height: 250px">
+			        							<p align="justify">{{ book.getBookProperty('description') }}</p>
 			      							</div>
 		    							</div>
 									</div>
@@ -150,22 +149,15 @@
 
 				</td>
 			</tr>
-			<tr>
+<!-- 			<tr>
 				<td></td>
 				<td></td>
-			</tr>
+			</tr> -->
 			
 		
-{% endfor %}		
-			
-			
-
-				</table>
-
-
-
-
-
+{% endfor %}	
+		</tbody>				
+	</table>
 	{% endif %}
-</table>
 </body>
+{% endblock content %}

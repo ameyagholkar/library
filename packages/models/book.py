@@ -30,3 +30,9 @@ class Book:
 		for isbn in isbn_list:
 			self.add(isbn['type'].lower(), isbn['identifier'])
 
+	def getNumberOfBooksAvailable(self):
+		if self.getBookProperty('availableQuantity') == None:
+			return 0
+		else:
+			return int(self.getBookProperty('availableQuantity'))
+	

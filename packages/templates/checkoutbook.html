@@ -8,8 +8,15 @@
 
 {% block bookactionend %}
 
-
-	<input type='Submit' value='Checkout {{ book.getBookProperty("title") }}' class='btn btn-primary'>
+	<button type='Submit' class='btn btn-primary'
+	{% if book.getNumberOfBooksAvailable() == 0 %}
+		disabled="disabled">Unavailable
+	{% else %}
+		> <i class="icon-shopping-cart icon-large"></i> Checkout
+	{% endif %}
+	</button>
+	<a href="{{book.getBookProperty('previewLink')}}" target="_blank" class="btn btn-primary">
+					<i class="icon-info-sign icon-large"></i>&nbsp;Info</a>
 	</form>
 	
 {% endblock bookactionend %}

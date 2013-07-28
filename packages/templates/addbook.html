@@ -7,11 +7,12 @@
 
 
 {% block bookactionend %}
-
-				{% if book.getBookProperty('isbn_13') %}
-					<input type='Submit' value='Add Book to Library' class='btn btn-primary' >
-				{% else %}
-					<input type='Submit' value='Invalid Book' class='btn' disabled="disabled">
-				{% endif %}
-				</form>
+		{% if book.getBookProperty('isbn_13') %}
+			<button type='Submit' class='btn btn-primary' ><i class="icon-book icon-large"></i>&nbsp;Add Book</button>
+		{% else %}
+			<button type='Submit'class='btn btn-primary' disabled="disabled"><i class="icon-ban-circle icon-large"></i>&nbsp;Invalid</button>
+		{% endif %}
+		<a href="{{book.getBookProperty('previewLink')}}" target="_blank" class="btn btn-primary">
+			<i class="icon-info-sign icon-large"></i>&nbsp;Info</a>
+		</form>
 {% endblock bookactionend %}

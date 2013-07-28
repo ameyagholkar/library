@@ -5,8 +5,7 @@ from packages import app
 from bookhelpers import retrieveBookByISBN, retrieveBookByTitle, retrieveBookByAuthor
 from connectdb import connect_db
 from models.book import Book
-from packages.Wrappers import needs_authentication
-from packages.authenticate import check_authentication
+from userhelpers import check_if_user_is_authenticated
 
 @app.route('/search/<isbn>')
 def searchBookByISBN(isbn):
@@ -19,7 +18,7 @@ def searchBookByISBN(isbn):
 
 @app.route('/search', methods=['GET', 'POST'])
 def search_books():
-	if check_authentication(session):
+	if check_if_user_is_authenticated(session):
 		query = request.form['query']
 		isbn = text = None
 		searchTitle = "Matching Books on our Shelf"
@@ -38,16 +37,18 @@ def search_books():
 														{"book.description" : { "$regex" : regx} },
 														{"book.authors" : { "$in" : { "$regex" : regx } } }
 											   ] })
-		for b in bookList:
-			bookPOJO = Book(b['book'])
-			if bookPOJO not in resultBookList:
-				resultBookList.append(bookPOJO)
+			
+		convertBooksToBooksPOJO(resultBookList, bookList)
 	
 		if len(resultBookList) == 0:
 			flash("No matching books found on our shelf.", 'error')
 			searchTitle = "Matching Books found on Earth"
-			(resultBookList, error) = search_books_on_google(query, isISBN)
-			return render_template('addbook.html', booksFound=resultBookList, searchTitle=searchTitle, error=error)
+			try:
+				(resultBookList, error) = search_books_on_google(query, isISBN)
+				return render_template('addbook.html', booksFound=resultBookList, searchTitle=searchTitle, error=error)
+			except Exception:
+				flash("Oops. Seems that you are not connected to the internet.", 'error')
+				return redirect(url_for('show_all_books'))
 				
 		return render_template('checkoutbook.html', booksFound=resultBookList, searchTitle=searchTitle, error=error)
 	else:
@@ -67,3 +68,11 @@ def search_books_on_google(query, isISBN):
 		error = 'No matching books found on Earth! Seems you want a rare book.'
 	return matchedBooks, error
 
+
+
+def convertBooksToBooksPOJO(resultBookList, bookList):
+	for b in bookList:
+		bookPOJO = Book(b['book'])
+		if bookPOJO not in resultBookList:
+			resultBookList.append(bookPOJO)
+		

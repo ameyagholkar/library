@@ -5,8 +5,11 @@ Created on Jul 1, 2013
 '''
 
 class User:
-    def __init__(self):
-        self.user = {}
+    def __init__(self, *args):
+        if len(args) == 0:
+            self.user = {}
+        else:
+            self.user = args[0]
 
     def __str__(self):
         return str(self.user)

@@ -1,5 +1,6 @@
 import requests
 from models.book import Book
+from connectdb import connect_db
 
 def printLists(list):
 	for item in list:
@@ -42,6 +43,7 @@ def convert_json_to_POJO_list(booksJson):
 			addBookProperty(book, b, 'language', 'volumeInfo', 'language')
 			addBookProperty(book, b, 'previewLink', 'volumeInfo', 'previewLink')
 			addBookProperty(book, b, 'country', 'saleInfo', 'country')
+			b.add('availableQuantity', 2)
 			matchedBooks.append(b)
 	return matchedBooks
 
@@ -64,5 +66,11 @@ def retrieveBookByAuthor(author):
 	matchedBooks = convert_json_to_POJO_list(booksJson)		
 	return matchedBooks
 
+def queryDBForBookByISBN(isbn):
+	return connect_db().books.find_one({ 'book.isbn_13' : str(isbn)})
+
+def updateBookQuantityAfterCheckout(isbn):
+	db = connect_db().books
+	db.update({'book.isbn_13': isbn}, {'$inc' : {'book.availableQuantity' : -1}})
 
 	
